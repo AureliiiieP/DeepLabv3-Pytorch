@@ -23,7 +23,7 @@ class DataLoaderLabel(torch.utils.data.Dataset):
         self.train_dir = train_dir
         self.lab_dir = lab_dir
         self.fileList = [
-            f.split(".")[0] for f in os.listdir(train_dir) if os.path.isfile(os.path.join(train_dir, f)) and ('.png' in f or ".jpg" in f)]
+            f for f in os.listdir(train_dir) if os.path.isfile(os.path.join(train_dir, f)) and ('.png' in f or ".jpg" in f or ".JPG" in f)]
         self.indexes = range(len(self.fileList))
         self.dic = {k: self.fileList[k] for k in self.indexes}
         self.resize = img_size
@@ -39,15 +39,13 @@ class DataLoaderLabel(torch.utils.data.Dataset):
             idx = idx.tolist()
 
         idx = self.indexes[idx]
-        try :
-            img_name = os.path.join(self.train_dir, self.dic[idx] + ".jpg")
-            image = Image.open(img_name).convert('RGB')
-            image.verify()
-        except :
-            img_name = os.path.join(self.train_dir, self.dic[idx] + ".png")
-            image = Image.open(img_name).convert('RGB')
-            image.verify()
-        ref_name = os.path.join(self.lab_dir, self.dic[idx] + ".png")
+
+        img_name = os.path.join(self.train_dir, self.dic[idx])
+        img_extension = img_name.split(".")[-1]
+        image = Image.open(img_name).convert('RGB')
+        image.verify()
+
+        ref_name = os.path.join(self.lab_dir, self.dic[idx].replace(img_extension, "png"))
 
         imageRef = Image.open(ref_name).convert('RGB')
         imageRef.verify()
@@ -87,7 +85,7 @@ class DataLoaderLabel(torch.utils.data.Dataset):
         for i in range(self.classList.size(0)):
             labelFinal += (labelImage == self.classList[i]).all(dim=-1) * i
 
-        return image_normalized, labelFinal, self.dic[idx], image
+        return image_normalized, labelFinal, self.dic[idx].split(".")[0] , image
 
 
 class DatasetTest(torch.utils.data.Dataset):
@@ -95,7 +93,7 @@ class DatasetTest(torch.utils.data.Dataset):
     def __init__(self, train_dir, img_size, classList):
         self.train_dir = train_dir
         self.fileList = [
-            f.split(".")[0] for f in os.listdir(train_dir) if os.path.isfile(os.path.join(train_dir, f))  and ('.png' in f or ".jpg" in f)]
+            f for f in os.listdir(train_dir) if os.path.isfile(os.path.join(train_dir, f))  and ('.png' in f or ".jpg" in f or ".JPG" in f)]
         self.indexes = range(len(self.fileList))
         self.dic = {k: self.fileList[k] for k in self.indexes}
         self.resize = img_size
@@ -109,14 +107,10 @@ class DatasetTest(torch.utils.data.Dataset):
             idx = idx.tolist()
 
         idx = self.indexes[idx]
-        try :
-            img_name = os.path.join(self.train_dir, self.dic[idx] + ".jpg")
-            image = Image.open(img_name).convert('RGB')
-            image.verify()
-        except :
-            img_name = os.path.join(self.train_dir, self.dic[idx] + ".png")
-            image = Image.open(img_name).convert('RGB')
-            image.verify()
+        img_name = os.path.join(self.train_dir, self.dic[idx])
+        image = Image.open(img_name).convert('RGB')
+        image.verify()
+
 
         # Resize
         image = torchvision.transforms.functional.resize(
@@ -129,4 +123,4 @@ class DatasetTest(torch.utils.data.Dataset):
         image_normalized = torchvision.transforms.functional.normalize(
             image, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
-        return image_normalized, self.dic[idx], image
+        return image_normalized, self.dic[idx].split(".")[0] , image
