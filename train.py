@@ -15,25 +15,25 @@ from utils.compute_loss import calculate_loss, print_losses
 from utils.visualizer import (visualization_step,
                                           visualize_epoch_curves)
 
-torch.manual_seed(config.seed)
+torch.manual_seed(config.SEED)
 
 def train():
     #################
     # Load Data
     #################
-    train_loader = get_loader(config.train_dir, config.label_dir, config.batchSize, "train", config.img_size, config.classList, config.data_aug_list)
-    valid_loader = get_loader(config.valid_dir, config.valid_label_dir, config.batchSize, "valid", config.img_size, config.classList)
+    train_loader = get_loader(config.TRAIN_IMG_DIR, config.TRAIN_LABEL_DIR, config.BATCH_SIZE, "train", config.IMG_SIZE, config.CLASS_LIST, config.DATA_AUG_LIST)
+    valid_loader = get_loader(config.VALID_IMG_DIR, config.VALID_LABEL_DIR, config.BATCH_SIZE, "valid", config.IMG_SIZE, config.CLASS_LIST)
 
     #################
     # Create Model
     #################
-    model = createDeepLabv3(config.nb_classes, config.img_size, config.architecture, config.pretrained, config.classifier)
+    model = createDeepLabv3(config.NB_CLASSES, config.IMG_SIZE, config.ARCHITECTURE, config.PRETRAINED, config.CLASSIFIER_HEAD)
     # Parallelization
     if config.USE_PARALLELIZATION == True:
         model = torch.nn.DataParallel(model)
     model.to(config.DEVICE)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=config.learningRate)
+    optimizer = torch.optim.Adam(model.parameters(), lr=config.LR)
 
     # Scheduler
     if config.USE_SCHEDULER :
@@ -43,17 +43,15 @@ def train():
     best_iou = [0]
     loss_values_train = []
     loss_values_val = []
-    mIoU_train = [[]for i in range(config.nb_classes)]
-    mIoU_val = [[]for i in range(config.nb_classes)]
+    mIoU_train = [[]for i in range(config.NB_CLASSES)]
+    mIoU_val = [[]for i in range(config.NB_CLASSES)]
 
     print("Starting Training")
-    for epoch in range(1, config.epochs + 1):
+    for epoch in range(1, config.EPOCHS + 1):
         elemCount_train = 0
         train_loss = 0
-        visualize_train = False
-        visualize_valid = False
-        count_intersection_train = np.zeros(config.nb_classes)
-        count_union_train = np.zeros(config.nb_classes)
+        count_intersection_train = np.zeros(config.NB_CLASSES)
+        count_union_train = np.zeros(config.NB_CLASSES)
 
         #################
         # Training
@@ -68,12 +66,12 @@ def train():
             pred = torch.argmax(output, dim=1)
 
             # Get Intersection & Union values (for computing IoU)
-            intersection_arr, union_arr = get_batch_intersection_union(output, target, config.nb_classes)
+            intersection_arr, union_arr = get_batch_intersection_union(output, target, config.NB_CLASSES)
             count_intersection_train += intersection_arr
             count_union_train += union_arr
 
             # Get Batch Loss
-            loss = calculate_loss(config.lossF, output, target, config.class_weight)
+            loss = calculate_loss(config.LOSS_FUNCTION, output, target, config.CLASS_WEIGHT)
             train_loss += loss.sum().item()
             elemCount_train += len(data)
 
@@ -82,11 +80,9 @@ def train():
             optimizer.step()
 
             # Visualization
-            if visualize_train == False:
-                if epoch % config.freq_save == 0:
-                    visualization_step(output, target, os.path.join(config.OUTPUT_TRAINING_ROOT, "visualization"), epoch,
-                                       config.nb_train_show, config.class_colors, "train", name, None)
-                visualize_train = True
+            if epoch % config.SAVE_FREQUENCY == 0:
+                visualization_step(output, target, os.path.join(config.OUTPUT_TRAINING_ROOT, "visualization"), epoch,
+                                    config.TRAIN_VISUALIZATION_NB_IMG_SHOW, config.CLASS_COLORS, "train", name, None)
 
         #################
         # Validation
@@ -94,8 +90,8 @@ def train():
         model.eval()
         valid_loss = 0
         elemCount_valid = 0
-        count_intersection_valid = np.zeros(config.nb_classes)
-        count_union_valid = np.zeros(config.nb_classes)
+        count_intersection_valid = np.zeros(config.NB_CLASSES)
+        count_union_valid = np.zeros(config.NB_CLASSES)
         with torch.no_grad():
             for data, target, name, not_norm_img in valid_loader:
                 # Get Data
@@ -106,21 +102,20 @@ def train():
                 pred = torch.argmax(output, dim=1)
 
                 # Get Intersection & Union values (for computing IoU)
-                intersection_arr, union_arr = get_batch_intersection_union(output, target, config.nb_classes)
+                intersection_arr, union_arr = get_batch_intersection_union(output, target, config.NB_CLASSES)
                 count_intersection_valid += intersection_arr
                 count_union_valid += union_arr
 
                 # Get Batch Loss
-                loss = calculate_loss(config.lossF, output, target, config.class_weight)
+                loss = calculate_loss(config.LOSS_FUNCTION, output, target, config.CLASS_WEIGHT)
                 valid_loss += loss.sum().item()
                 elemCount_valid += len(data)
 
                 # Visualization
-                if visualize_valid == False:
-                    if epoch % config.freq_save == 0:
-                        visualization_step(output, target, os.path.join(config.OUTPUT_TRAINING_ROOT, "visualization"), epoch,
-                                           config.nb_valid_show, config.class_colors, "val", name, None)
-                    visualize_valid = True
+                if epoch % config.SAVE_FREQUENCY == 0:
+                    visualization_step(output, target, os.path.join(config.OUTPUT_TRAINING_ROOT, "visualization"), epoch,
+                                        config.VALID_VISUALIZATION_NB_IMG_SHOW, config.CLASS_COLORS, "val", name, None)
+
 
         # Compute and save epoch loss
         train_loss /= elemCount_train
@@ -129,7 +124,7 @@ def train():
         loss_values_val.append(valid_loss)
 
         # Compute and save epoch IoU
-        train_miou, valid_miou = compute_epoch_IoU(count_intersection_train, count_union_train, count_intersection_valid, count_union_valid, config.nb_classes)
+        train_miou, valid_miou = compute_epoch_IoU(count_intersection_train, count_union_train, count_intersection_valid, count_union_valid, config.NB_CLASSES)
         mIoU_train = save_IoU_epoch(train_miou, mIoU_train)
         mIoU_val = save_IoU_epoch(valid_miou, mIoU_val)
 
@@ -145,13 +140,13 @@ def train():
             torch.save(model.state_dict(), os.path.join(config.OUTPUT_TRAINING_ROOT, 'best.pt'))
 
         # Save model by epoch
-        #if epoch % config.freq_save == 0:
+        #if epoch % config.SAVE_FREQUENCY == 0:
         #    torch.save(model.state_dict(), os.path.join(
         #        config.OUTPUT_TRAINING_ROOT, str(epoch) + '.pt'))
 
         # Save loss and mIoU plots evolution over epochs
         output_path_loss, output_path_train, output_path_val = visualize_epoch_curves(
-            epoch, config.OUTPUT_TRAINING_ROOT, loss_values_train, loss_values_val, mIoU_train, mIoU_val, config.nb_classes, config.class_labels)
+            epoch, config.OUTPUT_TRAINING_ROOT, loss_values_train, loss_values_val, mIoU_train, mIoU_val, config.NB_CLASSES, config.CLASS_LABELS)
 
         # Print metrics for this epoch
         print_losses(epoch, train_loss, valid_loss)
