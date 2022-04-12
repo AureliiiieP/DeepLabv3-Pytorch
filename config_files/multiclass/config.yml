@@ -1,0 +1,84 @@
+seed : 2019
+paths:
+  train:
+    img : "data/train/img"
+    label : "data/train/label"
+  validation :
+    img : "data/val/img"
+    label : "data/val/label"
+  test :
+    img : 'data/test'
+    label : 'data/test'
+  output :
+    training : "output/training/20220412_Refactoring"
+    inference : 'output/test/20220412_Refactoring'
+  pretrained_weights : ""
+logic :
+  device : "cuda"
+  classes :
+    - Background : 
+      r : 0
+      g : 0
+      b : 0
+    - Dough : 
+      r : 255
+      g : 128
+      b : 128
+    - Cheese : 
+      r : 255
+      g : 255
+      b : 0
+    - Mozzarella : 
+      r : 255
+      g : 255
+      b : 255
+    - Tomato Sauce : 
+      r : 128
+      g : 64
+      b : 64
+    - Prosciutto : 
+      r : 255
+      g : 0
+      b : 0
+  training :
+    architecture : "deeplabv3_resnet50"
+    pretrained : False
+    freeze_weight : False
+    data_aug :
+      - "hflip"
+      # - "vflip"
+    batch_size : 4
+    lr : 0.001
+    img_size : 512
+    epochs : 300
+    loss : 
+      function : "CE"
+      weights :
+        Background : 1
+        Dough : 1
+        Cheese : 1
+        Mozzarella : 1
+        Tomato Sauce : 1
+        Prosciutto : 1
+    scheduler :
+      use_schedule : False
+      patience : 80
+      factor : 0.8
+
+  inference :
+    quantization : 'fp16'
+  visualization :
+    show :
+      train : 2
+      validation : 2
+      frequency : 2
+  
+
+#DEVICE = torch.device("cuda")
+#
+#############################
+# Model parameters
+#############################
+#
+# Labels & class weights
+#CLASS_LIST = torch.Tensor([[0, 0, 0],[1.0, 128/255, 128/255],[1.0, 1.0, 0],[1.0, 1.0, 1.0],[128/255, 64/255, 64/255],[1.0, 0, 0]])
