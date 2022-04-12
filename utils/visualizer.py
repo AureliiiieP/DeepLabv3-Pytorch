@@ -64,17 +64,17 @@ def visualize_output(output, i, class_colors):
     visualization_image = cv2.cvtColor(visualization_image, cv2.COLOR_BGR2RGB)
     return pred, visualization_image
 
-def save_prediction(blank_image, target, output_dir, state, name):
+def save_prediction(visualization_image, target, output_dir, state, name):
     """
     Given a predicted image, reference image, saves them to the output_dir
     """
-    fname_pred_val = os.path.join(output_dir, name + "_pred_" + state +".jpg")
-    fname_ref_val = os.path.join(output_dir, name + "_ref_" + state + ".jpg")
-    cv2.imwrite(fname_pred_val, blank_image)
+    fname_pred = os.path.join(output_dir, name + "_pred_" + state +".jpg")
+    fname_ref = os.path.join(output_dir, name + "_ref_" + state + ".jpg")
+    cv2.imwrite(fname_pred, visualization_image)
+    # Save label
     
     plt.imshow(target.cpu())
-    plt.savefig(fname_ref_val)
-    return fname_pred_val, fname_ref_val
+    plt.savefig(fname_ref)
 
 def visualization_step(output, target, output_dir, epoch, nb_show, class_colors_dict, state, name):
     """
@@ -89,7 +89,7 @@ def visualization_step(output, target, output_dir, epoch, nb_show, class_colors_
     """
     class_colors = get_colors(class_colors_dict)
     for i in range(0, nb_show):
-        pred, blank_image = visualize_output(output, i, class_colors)
+        pred, visualization_image = visualize_output(output, i, class_colors)
         # Save images
         name_img = str(epoch) + "_" + name[i]
-        fname_pred, fname_ref = save_prediction(blank_image, target[i], output_dir, state, name_img)
+        save_prediction(visualization_image, target[i], output_dir, state, name_img)

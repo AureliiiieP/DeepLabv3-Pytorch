@@ -9,8 +9,7 @@ from loader import get_loader
 from models.create_model import create_model
 from utils.compute_IoU import get_batch_intersection_union, compute_epoch_IoU, save_IoU_epoch, print_IoU
 from utils.compute_loss import get_loss_weights, get_loss, calculate_loss, print_losses
-from utils.visualizer import (visualization_step,
-                                          visualize_epoch_curves)
+from utils.visualizer import (visualization_step, visualize_epoch_curves)
 
 
 def train(args):
