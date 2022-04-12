@@ -30,7 +30,7 @@ def visualize_mIoU(epoch_plot, data, output_path, considered_classes, class_labe
     ax = plt.subplot(111)
     for i in range(considered_classes):
         mIou_plot = np.arange(len(data[i]))
-        ax.plot(epoch_plot, data[i], label=class_labels[i])
+        ax.plot(epoch_plot, data[i], label=list(class_labels[i])[0])
     ax.legend()
     plt.show()
     plt.savefig(output_path)

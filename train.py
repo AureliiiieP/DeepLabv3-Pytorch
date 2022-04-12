@@ -221,7 +221,7 @@ def train(args):
     print("Best IoU is :", best_iou, best_valid_iou)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser = argparse.ArgumentParser(description='Segmentation model !')
     parser.add_argument('config', default="config_files/multiclass/config.py")
     args = parser.parse_args()
     train(args)
