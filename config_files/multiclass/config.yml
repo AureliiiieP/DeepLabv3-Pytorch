@@ -1,5 +1,12 @@
 seed : 2019
 paths:
+  preprocessing :
+    make_patches:
+      input : 'data/train/img'
+      output : "data/train/img_patches"
+    fuse_patches:
+      input : "data/train/img_patches"
+      output : "data/train/img_patches_fused"
   train:
     img : "data/train/img"
     label : "data/train/label"
@@ -40,6 +47,12 @@ logic :
       r : 255
       g : 0
       b : 0
+  preprocessing :
+    mode : "fuse"
+    patch_size : 1028
+    original_size :
+      width : 4032
+      height : 3024
   training :
     architecture : "deeplabv3_resnet50"
     pretrained : False
