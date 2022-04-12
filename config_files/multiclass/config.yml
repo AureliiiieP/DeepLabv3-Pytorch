@@ -71,14 +71,4 @@ logic :
     show :
       train : 2
       validation : 2
-      frequency : 2
-  
-
-#DEVICE = torch.device("cuda")
-#
-#############################
-# Model parameters
-#############################
-#
-# Labels & class weights
-#CLASS_LIST = torch.Tensor([[0, 0, 0],[1.0, 128/255, 128/255],[1.0, 1.0, 0],[1.0, 1.0, 1.0],[128/255, 64/255, 64/255],[1.0, 0, 0]])
+      frequency : 5
