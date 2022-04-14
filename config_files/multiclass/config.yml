@@ -2,24 +2,26 @@ seed : 2019
 paths:
   preprocessing :
     make_patches:
-      input : 'data/train/img'
-      output : "data/train/img_patches"
+      input : 'data/train/label'
+      output : "data/train/label_patches"
     fuse_patches:
       input : "data/train/img_patches"
       output : "data/train/img_patches_fused"
   train:
-    img : "data/train/img"
-    label : "data/train/label"
+    img : "data/train/img_patches"
+    label : "data/train/label_patches"
+    pretrained_weights : ""
   validation :
-    img : "data/val/img"
-    label : "data/val/label"
+    img : "data/val/img_patches"
+    label : "data/val/label_patches"
   test :
-    img : 'data/test'
-    label : 'data/test'
+    img : 'data/test/img_patches'
+    label : 'data/test/label_patches'
+    pretrained_weights : ""
   output :
-    training : "output/training/20220412_Refactoring"
-    inference : 'output/test/20220412_Refactoring'
-  pretrained_weights : ""
+    training : "output/training/20220414_Refactoring_patches"
+    inference : 'output/test/20220414_Refactoring_patches'
+  
 logic :
   device : "cuda"
   classes :
@@ -48,7 +50,7 @@ logic :
       g : 0
       b : 0
   preprocessing :
-    mode : "fuse"
+    mode : "crop"
     patch_size : 1028
     original_size :
       width : 4032
@@ -59,8 +61,8 @@ logic :
     freeze_weight : False
     data_aug :
       - "hflip"
-      # - "vflip"
-    batch_size : 4
+      - "vflip"
+    batch_size : 8
     lr : 0.001
     img_size : 512
     epochs : 300
@@ -84,4 +86,4 @@ logic :
     show :
       train : 2
       validation : 2
-      frequency : 5
+      frequency : 10
