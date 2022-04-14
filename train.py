@@ -43,8 +43,8 @@ def train(args):
     # Create Model
     #################
     model = create_model(config)
-    if config["paths"]["train"]"pretrained_weights"] != "":
-        model.load_state_dict(torch.load(config["paths"]["train"]"pretrained_weights"]))
+    if config["paths"]["train"]["pretrained_weights"] != "":
+        model.load_state_dict(torch.load(config["paths"]["train"]["pretrained_weights"]))
     model.to(device)
 
     optimizer = torch.optim.Adam(
