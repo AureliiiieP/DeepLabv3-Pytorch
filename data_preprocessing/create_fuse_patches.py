@@ -14,7 +14,7 @@ def create_patches(img_path, output_path, patch_size):
     # Calculate maximum number of patches we can get without resizing
     nb_patches_x = img.shape[0]//patch_size
     nb_patches_y = img.shape[1]//patch_size
-    print(f"Creating {nb_patches_x} x {nb_patches_y} patches")
+    print(f"Creating {nb_patches_x + 1} x {nb_patches_y + 1} patches")
     #img = cv2.resize(img, (nb_patches_x*patch_size, nb_patches_y*patch_size), interpolation = cv2.INTER_AREA)
     #cv2.imwrite(os.path.join(output_path,"resize.png"), img)
 
