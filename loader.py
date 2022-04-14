@@ -3,7 +3,7 @@ import torch
 import torchvision
 from PIL import Image
 
-def get_loader(config, state, drop_last=False):
+def get_loader(config, state, drop_last=True):
     """Returns data loader
     """
     img_dir = config["paths"][state]["img"]
