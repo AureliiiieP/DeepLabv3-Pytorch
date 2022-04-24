@@ -1,6 +1,20 @@
 # Semantic segmentation
 
-Semantic segmentation
+- [Semantic segmentation](#semantic-segmentation)
+  * [Prepare your data](#prepare-your-data)
+    + [(Optional) Make patches](#-optional--make-patches)
+  * [Training the model](#training-the-model)
+    + [Step 1. Fill out the config file](#step-1-fill-out-the-config-file)
+    + [Step 2. Train model](#step-2-train-model)
+    + [Step 3. Test model](#step-3-test-model)
+  * [Folder organization example](#folder-organization-example)
+  * [Example on toy dataset](#example-on-toy-dataset)
+    + [Toy dataset - Pizza topping](#toy-dataset---pizza-topping)
+    + [Training](#training)
+    + [Example of results](#example-of-results)
+  * [TO DO](#to-do)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 
 ## Prepare your data
