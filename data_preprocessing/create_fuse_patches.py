@@ -44,21 +44,23 @@ def fuse_patches(folder_path, img_name, output_path, original_size, patch_size):
     nb_patches_x = original_size[0]//patch_size
     nb_patches_y = original_size[1]//patch_size
     for file_path in glob.glob(os.path.join(folder_path,"*.png")): 
-        if img_name == os.path.basename(file_path).split("__")[0].split("_patch_")[0] :
-            im = Image.open(file_path)
-            img_id = int(file_path.split(img_name+"_patch_")[1].split("__")[0].split(".")[0])
-            if img_id<nb_patches_x*nb_patches_y:
-                column = img_id//nb_patches_x
-                row = img_id%nb_patches_x
-                image.paste(im, (row*patch_size, column*patch_size))
-            elif  img_id>=nb_patches_x*nb_patches_y and img_id<nb_patches_x*nb_patches_y+nb_patches_x:
-                position = img_id-(nb_patches_x*nb_patches_y)
-                image.paste(im, (position*patch_size,original_size[1]-patch_size))
-            elif  img_id>=nb_patches_x*nb_patches_y+nb_patches_x and img_id<nb_patches_x*nb_patches_y+nb_patches_x+nb_patches_y:
-                position = img_id-(nb_patches_x*nb_patches_y+nb_patches_x)
-                image.paste(im, (original_size[0]-patch_size,position*patch_size))
-            else :
-                image.paste(im, (original_size[0]-patch_size,original_size[1]-patch_size))
+        if "ref" not in file_path :
+            if img_name == os.path.basename(file_path).split("__")[0].split("_patch_")[0] :
+                im = Image.open(file_path)
+                im = im.resize((patch_size,patch_size))
+                img_id = int(file_path.split(img_name+"_patch_")[1].split("__")[0].split(".")[0])
+                if img_id<nb_patches_x*nb_patches_y:
+                    column = img_id//nb_patches_x
+                    row = img_id%nb_patches_x
+                    image.paste(im, (row*patch_size, column*patch_size))
+                elif  img_id>=nb_patches_x*nb_patches_y and img_id<nb_patches_x*nb_patches_y+nb_patches_x:
+                    position = img_id-(nb_patches_x*nb_patches_y)
+                    image.paste(im, (position*patch_size,original_size[1]-patch_size))
+                elif  img_id>=nb_patches_x*nb_patches_y+nb_patches_x and img_id<nb_patches_x*nb_patches_y+nb_patches_x+nb_patches_y:
+                    position = img_id-(nb_patches_x*nb_patches_y+nb_patches_x)
+                    image.paste(im, (original_size[0]-patch_size,position*patch_size))
+                else :
+                    image.paste(im, (original_size[0]-patch_size,original_size[1]-patch_size))
     image.save(os.path.join(output_path,img_name+'.jpg'), quality=95)
 
 def create_patches_multiple_img(folder_path, output_path, crop_size):
