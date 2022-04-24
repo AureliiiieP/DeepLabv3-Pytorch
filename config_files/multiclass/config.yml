@@ -2,11 +2,11 @@ seed : 2019
 paths:
   preprocessing :
     make_patches:
-      input : 'data/train/label'
-      output : "data/train/label_patches"
+      input : 'data/test/img'
+      output : "data/test/img_patches"
     fuse_patches:
-      input : "data/train/img_patches"
-      output : "data/train/img_patches_fused"
+      input : "output/test/sample_folder"
+      output : "output/test/sample_folder_fused"
   train:
     img : "data/train/img_patches"
     label : "data/train/label_patches"
@@ -17,10 +17,11 @@ paths:
   test :
     img : 'data/test/img_patches'
     label : 'data/test/label_patches'
-    pretrained_weights : ""
+    use_label : False
+    pretrained_weights : "output/training/example_training/best.pt"
   output :
-    training : "output/training/20220414_Refactoring_patches"
-    inference : 'output/test/20220414_Refactoring_patches'
+    training : "output/training/example_training"
+    inference : 'output/test/example_training'
   
 logic :
   device : "cuda"
@@ -50,8 +51,8 @@ logic :
       g : 0
       b : 0
   preprocessing :
-    mode : "crop"
-    patch_size : 1028
+    mode : "fuse"
+    patch_size : 2056
     original_size :
       width : 4032
       height : 3024

@@ -8,18 +8,21 @@ def get_loader(config, state, drop_last=True):
     """
     img_dir = config["paths"][state]["img"]
     lab_dir = config["paths"][state]["label"]
-    batch_size = config["logic"]["training"]["batch_size"]
+    if state == "test" : 
+        batch_size = 1
+    else :
+        batch_size = config["logic"]["training"]["batch_size"]
     img_size = config["logic"]["training"]["img_size"]
     classList = config["logic"]["classes"]
     data_aug_list = config["logic"]["training"]["data_aug"]
     
-    if lab_dir != None :
+    if config["paths"]["test"]["use_label"] != False :
         dataset = DataLoaderLabel(img_dir, lab_dir, state, img_size, classList, data_aug_list)
         loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=2, drop_last=drop_last)
     else :
         # Use for unannotated data (test)
-        dataset = DatasetTest(img_dir)
-        test_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, num_workers=2)
+        dataset = DatasetTest(img_dir, img_size, classList)
+        loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, num_workers=2)
 
     print("Number of images for", state, ":", len(dataset))
 
@@ -108,14 +111,23 @@ class DataLoaderLabel(torch.utils.data.Dataset):
 
 class DatasetTest(torch.utils.data.Dataset):
     # DataLoader for testing when there are no labels
-    def __init__(self, train_dir, img_size, classList):
-        self.train_dir = train_dir
+    def __init__(self, img_dir, img_size, classList):
+        self.img_dir = img_dir
         self.fileList = [
-            f for f in os.listdir(train_dir) if os.path.isfile(os.path.join(train_dir, f))  and ('.png' in f or ".jpg" in f or ".JPG" in f)]
+            f for f in os.listdir(img_dir) if os.path.isfile(os.path.join(img_dir, f))  and ('.png' in f or ".jpg" in f or ".JPG" in f)]
         self.indexes = range(len(self.fileList))
         self.dic = {k: self.fileList[k] for k in self.indexes}
         self.resize = img_size
         self.classList = classList
+        self.get_class_color_Tensor()
+
+    def get_class_color_Tensor(self):
+        classes_color = []
+        for seg_class in self.classList:
+            r,g,b = seg_class["r"], seg_class["g"], seg_class["b"]
+            color_normalized = [int(r)/255, int(g)/255, int(b)/255]
+            classes_color.append(color_normalized)
+        self.classesTensor = torch.Tensor(classes_color)
 
     def __len__(self):
         return len(self.fileList)
@@ -125,7 +137,9 @@ class DatasetTest(torch.utils.data.Dataset):
             idx = idx.tolist()
 
         idx = self.indexes[idx]
-        img_name = os.path.join(self.train_dir, self.dic[idx])
+
+        # Read image
+        img_name = os.path.join(self.img_dir, self.dic[idx])
         image = Image.open(img_name).convert('RGB')
         image.verify()
 

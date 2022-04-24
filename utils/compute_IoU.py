@@ -60,3 +60,16 @@ def compute_epoch_IoU(count_intersection_train, count_union_train, count_interse
             valid_miou[i] = count_intersection_valid[i]/count_union_valid[i]
 
     return train_miou, valid_miou
+
+def compute_test_IoU(count_intersection_test, count_union_test, nb_classes):
+    """Compute train and validation IoU for one epoch given union and intersection values
+    """
+    # Test IoU
+    test_miou = np.zeros(nb_classes)
+    for i in range(nb_classes):
+        if count_union_test[i] == 0 :
+            test_miou[i] = 0
+        else:
+            test_miou[i] = count_intersection_test[i]/count_union_test[i]
+
+    return test_miou

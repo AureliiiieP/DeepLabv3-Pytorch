@@ -68,13 +68,17 @@ def save_prediction(visualization_image, target, output_dir, state, name):
     """
     Given a predicted image, reference image, saves them to the output_dir
     """
-    fname_pred = os.path.join(output_dir, name + "_pred_" + state +".jpg")
-    fname_ref = os.path.join(output_dir, name + "_ref_" + state + ".jpg")
+    if state == "test" :
+        fname_pred = os.path.join(output_dir, name +".png")
+    else :
+        fname_pred = os.path.join(output_dir, name + "_pred_" + state +".png")
     cv2.imwrite(fname_pred, visualization_image)
-    # Save label
     
-    plt.imshow(target.cpu())
-    plt.savefig(fname_ref)
+    # Save label
+    if target != None :
+        fname_ref = os.path.join(output_dir, name + "_ref_" + state + ".png")
+        plt.imshow(target.cpu())
+        plt.savefig(fname_ref)
 
 def visualization_step(output, target, output_dir, epoch, nb_show, class_colors_dict, state, name):
     """
@@ -91,5 +95,12 @@ def visualization_step(output, target, output_dir, epoch, nb_show, class_colors_
     for i in range(0, nb_show):
         pred, visualization_image = visualize_output(output, i, class_colors)
         # Save images
-        name_img = str(epoch) + "_" + name[i]
-        save_prediction(visualization_image, target[i], output_dir, state, name_img)
+        if state == "train" :
+            name_img = str(epoch) + "_" + name[i]
+        else :
+            name_img = name[i]
+        
+        if target != None : 
+            save_prediction(visualization_image, target[i], output_dir, state, name_img)
+        else :
+            save_prediction(visualization_image, None, output_dir, state, name_img)
