@@ -52,7 +52,7 @@ def test(args):
         with torch.no_grad():
             for data, target, name in test_loader:
                 data, target = data.to(device), target.to(device)
-                
+
                 output = model(data)["out"]
                 pred = torch.argmax(output, dim=1)
                 

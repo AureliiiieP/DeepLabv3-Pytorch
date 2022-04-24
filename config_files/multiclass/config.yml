@@ -18,7 +18,7 @@ paths:
     img : 'data/test/img_patches'
     label : 'data/test/label_patches'
     use_label : False
-    pretrained_weights : "output/training/example_training/best.pt"
+    pretrained_weights : "output/training/20220414_Refactoring_patches/best.pt"
   output :
     training : "output/training/example_training"
     inference : 'output/test/example_training'
@@ -80,9 +80,6 @@ logic :
       use_schedule : False
       patience : 80
       factor : 0.8
-
-  inference :
-    quantization : 'fp16'
   visualization :
     show :
       train : 2
