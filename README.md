@@ -94,12 +94,12 @@ Please contact me if you want the dataset and annotation !
 
 Features to support training / inference include : 
 
-- Loss curve (train, validation)
-- mIoU curves (train, validation)
+- Loss curve (train, validation) updated every epoch
+- mIoU curves (train, validation) updated every epoch
 
 <img src="doc/curves.png"/>
 
-- Inference images on few samples (train, validation)
+- Inference images on few samples (train, validation). Frequency can be set in config file.
 - Copy of config.yml used for reproducibility
 
 <img src="doc/training_monitoring.png"/>
