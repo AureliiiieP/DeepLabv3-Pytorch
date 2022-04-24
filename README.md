@@ -99,10 +99,13 @@ Features to support training / inference include :
 
 <img src="doc/curves.png"/>
 
-- Inference images on few samples (train, validation). Frequency can be set in config file.
-- Copy of config.yml used for reproducibility
+- Inference images on few samples (train, validation) to visualize and monitor training progress. Frequency can be set in config file.
 
 <img src="doc/training_monitoring.png"/>
+
+- Copy of config.yml used for reproducibility
+
+
 
 ### Example of results ###
 Example of inference :
