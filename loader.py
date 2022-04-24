@@ -16,7 +16,7 @@ def get_loader(config, state, drop_last=True):
     classList = config["logic"]["classes"]
     data_aug_list = config["logic"]["training"]["data_aug"]
     
-    if config["paths"]["test"]["use_label"] != False :
+    if state != "test" or config["paths"]["test"]["use_label"] != False :
         dataset = DataLoaderLabel(img_dir, lab_dir, state, img_size, classList, data_aug_list)
         loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=2, drop_last=drop_last)
     else :
